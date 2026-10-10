@@ -1,2 +1,3 @@
-def hello() -> str:
-    return "Hello from django-bulk-save!"
+from .models import BulkSaveableModel, BulkSaveableInterface
+
+__all__ = ["BulkSaveableModel", "BulkSaveableInterface"]
