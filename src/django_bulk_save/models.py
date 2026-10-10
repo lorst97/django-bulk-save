@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from django.db import models
+from django.db import transaction
 
 
 class BulkSaveContext:
@@ -29,19 +30,20 @@ class BulkSaveableModel(models.Model):
     @contextmanager
     @classmethod
     def bulk_save(cls):
-        # context registering
-        try:
-            save_context = BulkSaveContext()
-            yield save_context
+        with transaction.atomic():
+            # context registering
+            try:
+                save_context = BulkSaveContext()
+                yield save_context
 
-            for instance in save_context.registry:
-                instance.before_save()
+                for instance in save_context.registry:
+                    instance.before_save()
 
-            # funzione che divide registry in create e update
-            # operazioni in blocco con relative liste
+                # funzione che divide registry in create e update
+                # operazioni in blocco con relative liste
 
-        finally:
-            pass
+            finally:
+                pass
 
 
 """
