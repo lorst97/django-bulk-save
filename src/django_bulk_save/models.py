@@ -24,11 +24,9 @@ class BulkSaveableModel(models.Model):
         Hook method to be called before saving the object.
         Override this method in your model to perform any actions before saving.
         """
-        print("logic before saving the object")
-        self.register(self.pk)
 
-    @contextmanager
     @classmethod
+    @contextmanager
     def bulk_save(cls):
         with transaction.atomic():
             try:
@@ -59,3 +57,6 @@ class BulkSaveableModel(models.Model):
                 raise
             finally:
                 pass
+
+    class Meta:
+        abstract = True

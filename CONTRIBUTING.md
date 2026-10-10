@@ -10,6 +10,17 @@ As an early prototype, the project also welcomes discussion about its design and
 - Share ideas or discuss larger changes in an issue so we can work through the approach together.
 - Submit a pull request with a clear description of the problem and how your changes address it. Include relevant tests or documentation updates when appropriate.
 
+## Running tests
+
+With Python 3.14 or later and a virtual environment activated, install the project with its test dependencies:
+
+```bash
+python -m pip install -e ".[test]"
+python -m pytest
+```
+
+The suite uses `pytest` and `pytest-django` with an in-memory SQLite database, so no external database is required. It covers the context registry, custom pre-save logic, bulk creation, grouped updates, and transaction rollback.
+
 ## Be kind and respectful
 
 Please keep every interaction friendly, polite, and respectful, including issues, pull requests, reviews, and other project discussions.

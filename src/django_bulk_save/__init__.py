@@ -1,3 +1,3 @@
-from .models import BulkSaveableModel, BulkSaveableInterface
+from .models import BulkSaveableModel
 
-__all__ = ["BulkSaveableModel", "BulkSaveableInterface"]
+__all__ = ["BulkSaveableModel"]
