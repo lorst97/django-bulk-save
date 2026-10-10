@@ -1,14 +1,16 @@
 [project]
 name = "django-bulk-save"
 version = "0.1.0"
-description = "Add your description here"
+description = "An efficiency utility for Django that combines custom per-instance save logic with bulk database updates."
 readme = "README.md"
 authors = [
-    { email = "lorenzostefani@iconbook.tech" }
+    { email = "lorenzostefani003@gmail.com" }
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "" 
+   "asgiref>=3.12.1",
+   "Django>=6.1.2",
+   "sqlparse>=0.6.0",
 ]
 
 [build-system]
