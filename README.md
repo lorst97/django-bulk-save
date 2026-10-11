@@ -2,13 +2,17 @@
 
 An efficiency utility for Django that aims to make bulk persistence easy when models require custom save logic.
 
+## Database support
+
+Currently, PostgreSQL is the only supported database engine. Support for other database engines will be developed upon request. Please open an issue specifying the engine you need and your use case.
+
 ## Motivation
 
-Django's `bulk_update()` efficiently updates multiple model instances, but it does not call each model's `save()` method. This means that custom logic in an overridden `save()` method—including required application-level validations—is skipped.
+Django's `bulk_update()` updates multiple model instances, but it does not call each model's `save()` method. This means that custom logic in an overridden `save()` method—including required application-level validations—is skipped.
 
 Calling `save()` on every instance runs that logic, but typically issues a separate update query for each object. When updating many objects, those individual database queries can become a significant performance cost.
 
-The library runs custom logic for each instance first, then persists updates with [`django-pgbulk`](https://django-pgbulk.readthedocs.io/en/stable/reference/#pgbulk.update) on PostgreSQL. Other database backends use Django's `bulk_update()`. New instances use Django's `bulk_create()` so generated primary keys are populated on supported backends. This keeps per-instance validation and preparation while reducing the number of database queries.
+The library runs custom logic for each instance first, then persists updates with [`django-pgbulk`](https://django-pgbulk.readthedocs.io/en/stable/reference/#pgbulk.update) on PostgreSQL. New instances use Django's `bulk_create()` so generated primary keys are populated. This keeps per-instance validation and preparation while reducing the number of database queries.
 
 ## Intended workflow
 
@@ -26,14 +30,14 @@ with Item.bulk_save() as context:
         context.register(item, update_fields=["name", "quantity"])
 ```
 
-Hooks run before any queued writes. Creates and updates are committed in one transaction, with updates grouped by their `update_fields`. PostgreSQL updates use `pgbulk.update()` with its default `ignore_unchanged=False`; unchanged rows are still updated. Performance depends on the workload and database and should be measured on PostgreSQL rather than inferred from SQLite tests.
+Hooks run before any queued writes. Creates and updates are committed in one transaction, with updates grouped by their `update_fields`. Updates exclusively use `pgbulk.update()` with its default `ignore_unchanged=False`; unchanged rows are still updated. Performance depends on the workload and should be measured on PostgreSQL.
 
 ## Tests
 
-Install the project and test dependencies with `python -m pip install -e '.[test]'`, then run `python -m pytest` for SQLite tests. To exercise the real PostgreSQL path, use a dedicated test server and a database user with permission to create test databases:
+Install the project and test dependencies with `python -m pip install -e '.[test]'`. The database tests require a dedicated PostgreSQL server and a database user with permission to create test databases:
 
 ```sh
-BULK_SAVE_TEST_POSTGRES=1 PGHOST=localhost PGPORT=5432 \
+PGHOST=localhost PGPORT=5432 \
 PGDATABASE=bulk_save PGUSER=postgres PGPASSWORD=your_password \
 python -m pytest
 ```

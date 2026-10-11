@@ -47,27 +47,17 @@ def test_updates_are_grouped_by_fields_and_preserve_other_columns():
     first.name, second.name = " first updated ", " second updated "
     first.quantity = 99
     third.quantity = 3
-    manager = Item.objects
-
-    postgres = connection.vendor == "postgresql"
-    update_patch = (
-        patch("django_bulk_save.models.pgbulk.update", wraps=pgbulk.update)
-        if postgres
-        else patch.object(manager, "bulk_update", wraps=manager.bulk_update)
-    )
-    with update_patch as update:
+    with patch("django_bulk_save.models.pgbulk.update", wraps=pgbulk.update) as update:
         with Item.bulk_save() as context:
             context.register(first, update_fields=["name"])
             context.register(second, update_fields=["name"])
             context.register(third, update_fields=["quantity"])
 
     assert update.call_count == 2
-    prefix = (Item,) if postgres else ()
-    field_argument = "update_fields" if postgres else "fields"
-    assert update.call_args_list[0].args == (*prefix, [first, second])
-    assert update.call_args_list[0].kwargs == {field_argument: ["name"]}
-    assert update.call_args_list[1].args == (*prefix, [third])
-    assert update.call_args_list[1].kwargs == {field_argument: ["quantity"]}
+    assert update.call_args_list[0].args == (Item, [first, second])
+    assert update.call_args_list[0].kwargs == {"update_fields": ["name"]}
+    assert update.call_args_list[1].args == (Item, [third])
+    assert update.call_args_list[1].kwargs == {"update_fields": ["quantity"]}
     first.refresh_from_db()
     second.refresh_from_db()
     third.refresh_from_db()
@@ -131,7 +121,6 @@ def test_update_failure_rolls_back_prior_bulk_create():
     assert Item.objects.count() == 1
 
 
-@pytest.mark.skipif(connection.vendor != "postgresql", reason="Requires PostgreSQL")
 def test_postgres_updates_use_values_and_persist_distinct_values():
     items = Item.objects.bulk_create([Item(name=f"item {i}") for i in range(100)])
     for i, item in enumerate(items):

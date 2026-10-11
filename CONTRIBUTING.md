@@ -16,10 +16,9 @@ With Python 3.14 or later and a virtual environment activated, install the proje
 
 ```bash
 python -m pip install -e ".[test]"
-python -m pytest
 ```
 
-The suite uses `pytest` and `pytest-django` with an in-memory SQLite database, so no external database is required. It covers the context registry, custom pre-save logic, bulk creation, grouped updates, and transaction rollback.
+The suite uses `pytest` and `pytest-django`. Database tests require PostgreSQL and cover custom pre-save logic, bulk creation, grouped updates through `pgbulk`, and transaction rollback. Follow the [PostgreSQL test instructions](README.md#tests) to configure the connection and run the suite. Context registry tests can run without a database using `python -m pytest tests/test_context.py`. Support for other database engines will be developed upon request; open an issue specifying the engine and use case.
 
 ## Be kind and respectful
 

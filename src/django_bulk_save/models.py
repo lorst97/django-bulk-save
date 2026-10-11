@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 
 import pgbulk
-from django.db import connection, models, transaction
+from django.db import models, transaction
 
 
 class BulkSaveContext:
@@ -49,11 +49,8 @@ class BulkSaveableModel(models.Model):
 
                 for fields, instances in updates.items():
                     if not fields:
-                        raise ValueError("Field names must be given to bulk_update().")
-                    if connection.vendor == "postgresql":
-                        pgbulk.update(cls, instances, update_fields=list(fields))
-                    else:
-                        cls.objects.bulk_update(instances, fields=list(fields))
+                        raise ValueError("Field names must be given to bulk_save().")
+                    pgbulk.update(cls, instances, update_fields=list(fields))
 
             except Exception as e:
                 print(f"Error during bulk save: {e}")
