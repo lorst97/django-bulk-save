@@ -10,6 +10,8 @@ requires-python = ">=3.14"
 dependencies = [
    "asgiref>=3.12.1",
    "Django>=6.1.2",
+   "django-pgbulk>=3.3,<4",
+   "psycopg[binary]>=3.2,<4",
    "sqlparse>=0.6.0",
 ]
 
