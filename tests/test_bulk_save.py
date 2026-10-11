@@ -5,7 +5,7 @@ import pgbulk
 from django.db import IntegrityError, connection
 from django.test.utils import CaptureQueriesContext
 
-from django_bulk_save import BulkSaveableModel
+from django_bulk_save import BulkSaveableModel, InvalidInstanceError, InvalidUpdateFieldsError
 from tests.models import Item
 
 pytestmark = pytest.mark.django_db
@@ -95,6 +95,7 @@ def test_validation_error_propagates_without_persisting_changes():
     existing.refresh_from_db()
     assert existing.name == "original"
     assert Item.objects.count() == 1
+    assert context.registry == []
 
 
 def test_exception_in_context_body_rolls_back_writes():
@@ -105,6 +106,7 @@ def test_exception_in_context_body_rolls_back_writes():
             raise RuntimeError("stop")
 
     assert Item.objects.count() == 0
+    assert context.registry == []
 
 
 def test_update_failure_rolls_back_prior_bulk_create():
@@ -119,6 +121,7 @@ def test_update_failure_rolls_back_prior_bulk_create():
     existing.refresh_from_db()
     assert existing.quantity == 0
     assert Item.objects.count() == 1
+    assert context.registry == []
 
 
 def test_postgres_updates_use_values_and_persist_distinct_values():
@@ -146,7 +149,7 @@ def test_empty_update_fields_roll_back_prior_create():
     existing = Item.objects.create(name="original")
     existing.name = "changed"
 
-    with pytest.raises(ValueError, match="Field names must be given"):
+    with pytest.raises(InvalidUpdateFieldsError, match="Field names must be given"):
         with Item.bulk_save() as context:
             context.register(Item(name="new"), update_fields=["name"])
             context.register(existing, update_fields=[])
@@ -154,3 +157,30 @@ def test_empty_update_fields_roll_back_prior_create():
     existing.refresh_from_db()
     assert existing.name == "original"
     assert Item.objects.count() == 1
+
+
+@pytest.mark.parametrize("field", ["missing", "id"])
+def test_invalid_model_fields_roll_back_context_writes(field):
+    existing = Item.objects.create(name="original")
+    with pytest.raises(InvalidUpdateFieldsError):
+        with Item.bulk_save() as context:
+            Item.objects.create(name="rolled back")
+            context.register(existing, update_fields=[field])
+    assert Item.objects.count() == 1
+    assert context.registry == []
+
+
+def test_invalid_instance_rolls_back_context_writes():
+    with pytest.raises(InvalidInstanceError):
+        with Item.bulk_save() as context:
+            Item.objects.create(name="rolled back")
+            context.register(object(), update_fields=["name"])
+    assert Item.objects.count() == 0
+    assert context.registry == []
+
+
+def test_context_clears_registry_after_success():
+    with Item.bulk_save() as context:
+        context.register(Item(name="saved"), update_fields=["name"])
+    assert context.registry == []
+    assert Item.objects.get().name == "saved"

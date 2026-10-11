@@ -16,6 +16,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+docs = [
+    "Sphinx>=8",
+]
 test = [
     "pytest>=9.0",
     "pytest-django>=4.12",

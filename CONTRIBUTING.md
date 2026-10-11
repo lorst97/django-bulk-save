@@ -20,6 +20,17 @@ python -m pip install -e ".[test]"
 
 The suite uses `pytest` and `pytest-django`. Database tests require PostgreSQL and cover custom pre-save logic, bulk creation, grouped updates through `pgbulk`, and transaction rollback. Follow the [PostgreSQL test instructions](README.md#tests) to configure the connection and run the suite. Context registry tests can run without a database using `python -m pytest tests/test_context.py`. Support for other database engines will be developed upon request; open an issue specifying the engine and use case.
 
+## Building documentation
+
+The documentation is written in reStructuredText under `docs/`. Install Sphinx and build HTML with warnings treated as errors:
+
+```bash
+python -m pip install -e '.[docs]'
+python -m sphinx -b html -W --keep-going docs docs/_build/html
+```
+
+Open `docs/_build/html/index.html` to review the result. Update the usage guide and API reference when changing public behavior.
+
 ## Be kind and respectful
 
 Please keep every interaction friendly, polite, and respectful, including issues, pull requests, reviews, and other project discussions.
