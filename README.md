@@ -68,7 +68,7 @@ Errors raised by `before_save()`, the context body, and the database propagate u
 
 ## Documentation
 
-The documentation uses reStructuredText and Sphinx. Build it from the repository root:
+The documentation uses standard reStructuredText so it can be read directly on GitHub. Sphinx adds navigation when building the HTML version. Build it from the repository root:
 
 ```sh
 python -m pip install -e '.[docs]'

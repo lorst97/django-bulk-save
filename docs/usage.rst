@@ -118,7 +118,7 @@ Catch errors outside the ``with`` block so transaction handling can finish:
        raise
 
 ``BulkSaveError`` covers the library's own validation errors, described in
-:doc:`api`. Exceptions raised by hooks, the context body, and PostgreSQL retain
+the `API reference <api.rst>`_. Exceptions raised by hooks, the context body, and PostgreSQL retain
 their original types. In the example model, an empty name raises ``ValueError``.
 
 Rollback affects database writes, not Python attributes or external side

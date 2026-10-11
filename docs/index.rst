@@ -11,10 +11,9 @@ and your use case.
 
 The project is an early prototype and its API is still under development.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Documentation
+Documentation
+-------------
 
-   installation
-   usage
-   api
+* `Installation <installation.rst>`_
+* `Usage guide <usage.rst>`_
+* `API reference <api.rst>`_
